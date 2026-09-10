@@ -1,0 +1,25 @@
+# The quick-research-campaign bundle patch.
+#
+# `dsh plugin --profile <name> add quick-research-campaign` installs this package
+# into the profile and stacks this file as one patch layer, so the row below is
+# inserted into that profile's composition and takes effect on restart.
+#
+# The row publishes NO service: it registers three model-facing tools and one
+# skill into the host `tools` and `skills` registries. It therefore needs no
+# `isolate` realm — a realm would hide the host registries it must reach rather
+# than protect anything. What it owns is per-agent process state: one tuning
+# ledger per calling session, so nothing is shared between sessions.
+#
+# A profile's own cordis.patch.yml addresses this row by id and replaces its
+# whole `config`, so `maxTrialsPerCampaign` is changeable without forking the
+# package.
+
+- insert:
+    - id: tool-research-campaign
+      name: 'quick-research-campaign'
+      config:
+        # Required with no default. The ledger is in-memory, so this ceiling is
+        # what keeps a mistaken space declaration from materializing an
+        # unbounded trial matrix; a larger `max_trials` call is rejected rather
+        # than truncated.
+        maxTrialsPerCampaign: 24
